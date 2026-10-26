@@ -17,9 +17,14 @@ public class Aula {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String nombre;
-    private int capacidad;
-    private boolean ordenadores;
+
+    @Column(nullable = false)
+    private Integer capacidad;
+
+    @Column(nullable = false)
+    private Boolean tieneOrdenadores;
 
     @JsonIgnore
     @OneToMany(mappedBy = "aula", cascade = CascadeType.REMOVE)
