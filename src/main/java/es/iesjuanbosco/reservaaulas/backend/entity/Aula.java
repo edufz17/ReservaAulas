@@ -1,4 +1,4 @@
-package es.iesjuanbosco.reservaaulas.entity;
+package es.iesjuanbosco.reservaaulas.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -6,26 +6,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FranjaHoraria {
-
+public class Aula {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String nombre;
-    private LocalDateTime horaInicio;
-    private LocalDateTime horaFin;
+
+    @Column(nullable = false)
+    private Integer capacidad;
+
+    @Column(nullable = false)
+    private Boolean tieneOrdenadores;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "franjaHoraria", cascade = CascadeType.REMOVE)
-    private List<Reserva> reserva;
-
+    @OneToMany(mappedBy = "aula", cascade = CascadeType.REMOVE)
+    private List<Reserva> reservas;
 
 }

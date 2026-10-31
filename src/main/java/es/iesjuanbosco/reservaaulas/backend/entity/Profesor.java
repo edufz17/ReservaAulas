@@ -1,4 +1,4 @@
-package es.iesjuanbosco.reservaaulas.entity;
+package es.iesjuanbosco.reservaaulas.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Aula {
+public class Profesor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,14 +20,17 @@ public class Aula {
     @Column(length = 50, nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
-    private Integer capacidad;
+    @Column(length = 100, nullable = false)
+    private String apellidos;
 
-    @Column(nullable = false)
-    private Boolean tieneOrdenadores;
+    @Column(length = 50, nullable = false)
+    private String email;
+
+    @Column(length = 15, nullable = false)
+    private String telefono;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "aula", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "profesor", cascade = CascadeType.REMOVE)
     private List<Reserva> reservas;
 
 }

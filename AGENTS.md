@@ -9,9 +9,9 @@ Spring Data JPA, Hibernate, Lombok y MySQL. El paquete raíz es
 
 La aplicación sigue una estructura sencilla:
 
-- `src/main/java/.../entity`: entidades JPA y relaciones del dominio.
-- `src/main/java/.../repository`: interfaces `JpaRepository`.
-- `src/main/java/.../controller`: endpoints REST y operaciones CRUD.
+- `src/main/java/.../backend/entity`: entidades JPA y relaciones del dominio.
+- `src/main/java/.../backend/repository`: interfaces `JpaRepository`.
+- `src/main/java/.../backend/controller`: endpoints REST y operaciones CRUD.
 - `src/main/resources/application.properties`: configuración de MySQL y JPA.
 - `src/test/java`: pruebas de contexto y futuras pruebas de API/dominio.
 
@@ -61,4 +61,3 @@ configuración requerida o usa un perfil de pruebas aislado.
 - Revisa el diff para evitar cambios accidentales en configuración o secretos.
 - Actualiza `README.md` cuando cambien endpoints, configuración, decisiones
   técnicas o limitaciones conocidas.
-

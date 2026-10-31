@@ -1,15 +1,16 @@
 # ReservaAulas
 
-API REST para la gestión de aulas y reservas de un centro educativo. Permite
-mantener aulas, profesores y franjas horarias, y asociarlos en reservas
-persistidas en MySQL.
+API REST y frontend estático para la gestión de aulas y reservas de un centro
+educativo. Permite mantener aulas, profesores y franjas horarias, y asociarlos
+en reservas persistidas en MySQL.
 
 ## Estado actual
 
-El proyecto es un backend funcional de alcance inicial. Implementa operaciones
-CRUD mediante Spring MVC y Spring Data JPA. No incluye todavía una interfaz
-web, autenticación/autorización, documentación OpenAPI ni reglas completas de
-planificación.
+El proyecto es un backend funcional de alcance inicial y un frontend estático
+sin frameworks. El backend implementa operaciones CRUD mediante Spring MVC y
+Spring Data JPA; el frontend permite consultar y registrar aulas y reservas.
+No incluye autenticación/autorización, documentación OpenAPI ni reglas completas
+de planificación.
 
 ### Tecnologías
 
@@ -20,15 +21,23 @@ planificación.
 - MySQL Connector/J
 - Lombok
 - Maven Wrapper (`./mvnw`)
+- HTML, CSS y JavaScript nativo para el frontend
 
 ## Estructura
 
 ```text
 src/main/java/es/iesjuanbosco/reservaaulas/
 ├── ReservaAulasApplication.java
-├── controller/       # API HTTP
-├── entity/           # Aula, Profesor, FranjaHoraria y Reserva
-└── repository/       # Repositorios Spring Data
+├── config/           # Configuración HTTP, incluido CORS local
+└── backend/
+    ├── controller/   # API HTTP
+    ├── entity/       # Aula, Profesor, FranjaHoraria y Reserva
+    └── repository/   # Repositorios Spring Data
+
+frontend/
+├── index.html         # Vista principal
+├── styles.css         # Estilos responsive
+└── app.js             # Estado, peticiones y eventos
 ```
 
 Una `Reserva` relaciona un `Profesor`, un `Aula` y una `FranjaHoraria`. La fecha
@@ -47,6 +56,19 @@ no versionada antes de iniciar la aplicación.
 ./mvnw test
 ./mvnw spring-boot:run
 ```
+
+En otra terminal, sirve el frontend desde su carpeta para que el navegador
+pueda realizar peticiones a la API:
+
+```bash
+cd frontend
+python3 -m http.server 5500
+```
+
+Después abre `http://localhost:5500`. El frontend usa por defecto
+`http://localhost:8080` como URL de API y el backend permite CORS únicamente
+desde `localhost:5500` y `127.0.0.1:5500`. Para otra dirección, cambia
+`API_URL` en `frontend/app.js` y la política CORS de `WebConfig`.
 
 La aplicación se inicia con el nombre `ReservaAulas`. JPA está configurado con
 `ddl-auto=update`, por lo que Hibernate actualiza el esquema durante el

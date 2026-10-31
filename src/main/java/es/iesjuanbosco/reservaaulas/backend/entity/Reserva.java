@@ -1,6 +1,5 @@
-package es.iesjuanbosco.reservaaulas.entity;
+package es.iesjuanbosco.reservaaulas.backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

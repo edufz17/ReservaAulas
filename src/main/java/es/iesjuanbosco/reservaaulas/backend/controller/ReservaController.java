@@ -1,7 +1,7 @@
-package es.iesjuanbosco.reservaaulas.controller;
+package es.iesjuanbosco.reservaaulas.backend.controller;
 
-import es.iesjuanbosco.reservaaulas.entity.Reserva;
-import es.iesjuanbosco.reservaaulas.repository.ReservaRepository;
+import es.iesjuanbosco.reservaaulas.backend.entity.Reserva;
+import es.iesjuanbosco.reservaaulas.backend.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
