@@ -15,9 +15,24 @@ import java.util.Optional;
 public class AulaController {
     private final AulaRepository aulaRepository;
 
-    @GetMapping("/aulas")
-    public ResponseEntity<List<Aula>> findAll() {
-        return ResponseEntity.ok(aulaRepository.findAll());
+    @GetMapping({"/aulas", "/aulas/"})
+    public ResponseEntity<List<Aula>> findAll(
+            @RequestParam(required = false) Boolean ordenadores,
+            @RequestParam(required = false) Integer capacidad) {
+        List<Aula> aulas;
+
+        if (ordenadores != null && capacidad != null) {
+            aulas = aulaRepository.findByTieneOrdenadoresAndCapacidadGreaterThan(
+                    ordenadores, capacidad);
+        } else if (ordenadores != null) {
+            aulas = aulaRepository.findByTieneOrdenadores(ordenadores);
+        } else if (capacidad != null) {
+            aulas = aulaRepository.findByCapacidadGreaterThan(capacidad);
+        } else {
+            aulas = aulaRepository.findAll();
+        }
+
+        return ResponseEntity.ok(aulas);
     }
 
     @GetMapping("/aulas/{id}")
