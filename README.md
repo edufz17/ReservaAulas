@@ -31,7 +31,6 @@ src/main/java/es/iesjuanbosco/reservaaulas/
 ├── config/           # Configuración HTTP, incluido CORS local
 └── backend/
     ├── controller/   # API HTTP
-    ├── service/      # Lógica de negocio y validaciones (ReservaService)
     ├── entity/       # Aula, Profesor, FranjaHoraria y Reserva
     └── repository/   # Repositorios Spring Data
 
@@ -111,20 +110,20 @@ Durante el desarrollo se identificaron estos puntos relevantes:
    necesitan una base de datos disponible. Se mantuvo MySQL porque es la
    tecnología configurada por el proyecto y se evitó añadir una base embebida
    que pudiera ocultar problemas de integración.
-2. **Lógica de negocio y validación de reservas.** Se implementó `ReservaService`
-   para aislar las reglas de negocio de la reserva: impedir fechas anteriores a
-   la actual (`400 Bad Request`) e impedir que se solapen dos reservas para la
-   misma aula y franja horaria en una misma fecha (`409 Conflict`).
+2. **Lógica de negocio y validación de reservas.** Las reglas de inserción se
+   mantienen en `ReservaController`, respetando la estructura actual sin una
+   carpeta `service`: se impiden fechas anteriores a la actual (`400 Bad Request`)
+   y reservas para un aula y franja ya ocupadas en la misma fecha (`409 Conflict`).
 3. **Validación de entradas.** Se validan las referencias obligatorias y la
    existencia previa de profesor, aula y franja horaria antes de persistir la
    reserva, evitando errores de integridad en cascada.
 4. **Esquema gestionado por Hibernate.** `ddl-auto=update` facilita el
    desarrollo local, pero no es una estrategia de despliegue reproducible. Se
    dejó documentada la necesidad de migraciones antes de producción.
-5. **Cobertura de pruebas.** Se añadieron pruebas unitarias para `ReservaService`
-   verificando el caso válido, el conflicto por solapamiento y el rechazo de fechas
-   anteriores a la actual. La prueba de contexto de Spring Boot verifica la carga
-   general con la base de datos MySQL activa.
+5. **Cobertura de pruebas.** Se añadieron pruebas unitarias para
+   `ReservaController` verificando el caso válido, el conflicto por solapamiento
+   y el rechazo de fechas anteriores a la actual. La prueba de contexto de Spring
+   Boot verifica la carga general con la base de datos MySQL activa.
 6. **Advertencias del entorno de pruebas.** Maven completó correctamente, aunque
    el runtime mostró advertencias de Mockito sobre el auto-attach de su agente y
    de Spring sobre `open-in-view`. No se ocultaron esas advertencias; deben
@@ -132,8 +131,8 @@ Durante el desarrollo se identificaron estos puntos relevantes:
 
 Las propuestas de la IA se aplicaron de forma conservadora: reutilizar
 `JpaRepository`, devolver códigos HTTP coherentes, evitar ciclos JSON mediante
-`@JsonIgnore`, separar futuras reglas de negocio en servicios y documentar las
-deudas técnicas en vez de simular que ya estaban resueltas.
+`@JsonIgnore` y documentar las deudas técnicas en vez de simular que ya estaban
+resueltas.
 
 ## Prompts utilizados como referencia
 
