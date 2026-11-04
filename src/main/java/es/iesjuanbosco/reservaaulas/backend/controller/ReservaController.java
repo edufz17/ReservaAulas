@@ -1,8 +1,9 @@
 package es.iesjuanbosco.reservaaulas.backend.controller;
 
 import es.iesjuanbosco.reservaaulas.backend.entity.Reserva;
-import es.iesjuanbosco.reservaaulas.backend.repository.ReservaRepository;
+import es.iesjuanbosco.reservaaulas.backend.service.ReservaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,36 +12,40 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ReservaController {
-    private final ReservaRepository reservaRepository;
+
+    private final ReservaService reservaService;
 
     @GetMapping("/reservas")
     public ResponseEntity<List<Reserva>> findAll() {
-        return ResponseEntity.ok(reservaRepository.findAll());
+        return ResponseEntity.ok(reservaService.findAll());
     }
 
     @GetMapping("/reservas/{id}")
     public ResponseEntity<Reserva> findById(@PathVariable Long id) {
-        return reservaRepository.findById(id)
+        return reservaService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/reservas")
     public ResponseEntity<Reserva> create(@RequestBody Reserva reserva) {
-        return ResponseEntity.ok(reservaRepository.save(reserva));
+        Reserva guardada = reservaService.create(reserva);
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
     }
 
     @PutMapping("/reservas/{id}")
     public ResponseEntity<Reserva> update(@PathVariable Long id, @RequestBody Reserva reserva) {
-        if (!reservaRepository.existsById(id)) return ResponseEntity.notFound().build();
-        reserva.setId(id);
-        return ResponseEntity.ok(reservaRepository.save(reserva));
+        return reservaService.update(id, reserva)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/reservas/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!reservaRepository.existsById(id)) return ResponseEntity.notFound().build();
-        reservaRepository.deleteById(id);
+        boolean eliminada = reservaService.delete(id);
+        if (!eliminada) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.noContent().build();
     }
 }

@@ -31,6 +31,7 @@ src/main/java/es/iesjuanbosco/reservaaulas/
 ├── config/           # Configuración HTTP, incluido CORS local
 └── backend/
     ├── controller/   # API HTTP
+    ├── service/      # Lógica de negocio y validaciones (ReservaService)
     ├── entity/       # Aula, Profesor, FranjaHoraria y Reserva
     └── repository/   # Repositorios Spring Data
 
@@ -96,10 +97,11 @@ curl -X POST http://localhost:8080/aulas \
   -d '{"nombre":"Aula 101","capacidad":30,"tieneOrdenadores":true}'
 ```
 
-Las operaciones de creación devuelven `201 Created` en aulas, profesores y
-franjas horarias. Las reservas devuelven actualmente `200 OK`. La consulta de
-un identificador inexistente devuelve `404 Not Found` y el borrado correcto
-devuelve `204 No Content`.
+Las operaciones de creación devuelven `201 Created` en todas las entidades
+(aulas, profesores, franjas horarias y reservas). La consulta de un identificador
+inexistente devuelve `404 Not Found` y el borrado correcto devuelve `204 No Content`.
+En caso de conflicto por solapamiento de reservas se responde con `409 Conflict`,
+y ante fechas pasadas o datos incompletos con `400 Bad Request`.
 
 ## Problemas encontrados y decisiones tomadas
 
@@ -109,20 +111,20 @@ Durante el desarrollo se identificaron estos puntos relevantes:
    necesitan una base de datos disponible. Se mantuvo MySQL porque es la
    tecnología configurada por el proyecto y se evitó añadir una base embebida
    que pudiera ocultar problemas de integración.
-2. **Lógica de negocio mínima.** Los controladores delegan directamente en los
-   repositorios. Se decidió conservar este alcance para la primera versión,
-   pero la siguiente ampliación debe validar fechas, relaciones y conflictos
-   antes de guardar una reserva.
-3. **Validación insuficiente.** Las entidades no usan `@Valid` ni restricciones
-   Bean Validation. Por ello, datos incompletos pueden llegar hasta la capa de
-   persistencia. Es una deuda conocida, no una garantía de la API.
+2. **Lógica de negocio y validación de reservas.** Se implementó `ReservaService`
+   para aislar las reglas de negocio de la reserva: impedir fechas anteriores a
+   la actual (`400 Bad Request`) e impedir que se solapen dos reservas para la
+   misma aula y franja horaria en una misma fecha (`409 Conflict`).
+3. **Validación de entradas.** Se validan las referencias obligatorias y la
+   existencia previa de profesor, aula y franja horaria antes de persistir la
+   reserva, evitando errores de integridad en cascada.
 4. **Esquema gestionado por Hibernate.** `ddl-auto=update` facilita el
    desarrollo local, pero no es una estrategia de despliegue reproducible. Se
    dejó documentada la necesidad de migraciones antes de producción.
-5. **Cobertura de pruebas reducida.** Actualmente existe una prueba de carga del
-   contexto (`contextLoads`). El resultado se verificó con `./mvnw test`;
-   conviene añadir pruebas de controladores, repositorios y reglas de
-   solapamiento antes de considerar estable la aplicación.
+5. **Cobertura de pruebas.** Se añadieron pruebas unitarias para `ReservaService`
+   verificando el caso válido, el conflicto por solapamiento y el rechazo de fechas
+   anteriores a la actual. La prueba de contexto de Spring Boot verifica la carga
+   general con la base de datos MySQL activa.
 6. **Advertencias del entorno de pruebas.** Maven completó correctamente, aunque
    el runtime mostró advertencias de Mockito sobre el auto-attach de su agente y
    de Spring sobre `open-in-view`. No se ocultaron esas advertencias; deben
@@ -164,9 +166,8 @@ decisión explícita.
 
 ## Próximos pasos recomendados
 
-- Añadir Bean Validation y manejo centralizado de errores.
-- Crear una capa de servicio para reservas y rechazar solapamientos.
-- Añadir pruebas HTTP y de persistencia independientes del entorno local.
-- Incorporar migraciones de base de datos y perfiles de configuración.
-- Añadir autenticación, autorización y documentación OpenAPI si el sistema se
+- Añadir Bean Validation declarativo (`@Valid`, anotaciones JSR-380) y `@ControllerAdvice`.
+- Añadir pruebas de integración HTTP (`@SpringBootTest` con `@AutoConfigureMockMvc`).
+- Incorporar migraciones de base de datos (Flyway o Liquibase) y perfiles de configuración.
+- Añadir autenticación, autorización y documentación OpenAPI/Swagger si el sistema se
   expone fuera del entorno académico.

@@ -15,7 +15,14 @@ async function request(path, options = {}) {
     headers: { "Content-Type": "application/json", ...options.headers },
     ...options
   });
-  if (!response.ok) throw new Error(`La API respondió con ${response.status}`);
+  if (!response.ok) {
+    let errorDetail = "";
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || err.message || "";
+    } catch (_) {}
+    throw new Error(errorDetail || `La API respondió con ${response.status}`);
+  }
   return response.status === 204 ? null : response.json();
 }
 
@@ -108,7 +115,7 @@ async function createBooking(event) {
     showMessage("Reserva registrada correctamente.");
     await loadData();
   } catch (error) {
-    showMessage("No se pudo registrar la reserva.", true);
+    showMessage(error.message || "No se pudo registrar la reserva.", true);
   }
 }
 
